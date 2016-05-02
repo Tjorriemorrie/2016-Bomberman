@@ -18,9 +18,8 @@ ACTIONS = {
 
 
 def main(player_key, output_path):
-    logger.info('Player key: {}'.format(player_key))
-    logger.info('Output path: {}'.format(output_path))
-
+    logger.debug('Player key: {}'.format(player_key))
+    logger.debug('Output path: {}'.format(output_path))
 
     with open(os.path.join(output_path, 'state.json'), 'r', encoding='utf-8-sig') as f:
         state = json.load(f)

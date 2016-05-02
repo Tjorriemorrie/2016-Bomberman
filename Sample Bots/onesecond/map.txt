@@ -1,0 +1,58 @@
+Map Width: 21, Map Height: 21, Current Round: 4, Seed: 1418595978
+#####################
+#   + ++  +  ++ +  D#
+#A# # #+# # #+# # # #
+#3++   +     +   ++ #
+#+# # # # # # # # #+#
+#++    ++ + ++    ++#
+# # # #+#+#+#+# # # #
+# +++ +  + +  + +++ #
+#+#+#+# #+#+# #+#+#+#
+#      +++++++      #
+#+# #+#+#+$+#+#+# #+#
+#      +++++++      #
+#+#+#+# #+#+# #+#+#+#
+# +++ +  + +  + +++ #
+# # # #+#+#+#+# # # #
+#++    ++ + ++    ++#
+#+# # # # # # # # #+#
+#3++   +     +   ++ #
+#C# # #+# # #+# #b# #
+#   + ++  +  ++ +   #
+#####################
+---------------------------
+Player Name: Player 1
+Key: A
+Points: 1
+Status: Alive
+Bombs: {x:2,y:4,fuse:3,radius:1}
+BombBag: 0
+BlastRadius: 1
+---------------------------
+---------------------------
+Player Name: John
+Key: B
+Points: 1
+Status: Alive
+Bombs: {x:18,y:19,fuse:4,radius:1}
+BombBag: 0
+BlastRadius: 1
+---------------------------
+---------------------------
+Player Name: John
+Key: C
+Points: 1
+Status: Alive
+Bombs: {x:2,y:18,fuse:3,radius:1}
+BombBag: 0
+BlastRadius: 1
+---------------------------
+---------------------------
+Player Name: Py3
+Key: D
+Points: 0
+Status: Alive
+Bombs: 
+BombBag: 1
+BlastRadius: 1
+---------------------------
