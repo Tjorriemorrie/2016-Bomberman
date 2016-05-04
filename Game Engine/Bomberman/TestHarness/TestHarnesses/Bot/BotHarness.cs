@@ -186,23 +186,23 @@ namespace TestHarness.TestHarnesses.Bot
         private void WriteStateFile(GameMap gameMap)
         {
             var dir = Path.Combine(CurrentWorkingDirectory, Settings.Default.StateFileName);
-            var renderer = new GameMapRender(gameMap);
+            var renderer = new GameMapRender(gameMap, true);
             var json = renderer.RenderJsonGameState();
 
             CreateFile(dir);
 
-            File.WriteAllText(dir, json.ToString(), Encoding.UTF8);
+            File.WriteAllText(dir, json.ToString(), new UTF8Encoding(false));
         }
 
         private void WriteMapFile(GameMap gameMap)
         {
             var dir = Path.Combine(CurrentWorkingDirectory, Settings.Default.MapFileName);
-            var renderer = new GameMapRender(gameMap);
+            var renderer = new GameMapRender(gameMap, true);
             var map = renderer.RenderTextGameState();
 
             CreateFile(dir);
 
-            File.WriteAllText(dir, map.ToString(), Encoding.UTF8);
+            File.WriteAllText(dir, map.ToString(), new UTF8Encoding(false));
         }
 
         private void WriteLogs()
@@ -211,7 +211,7 @@ namespace TestHarness.TestHarnesses.Bot
 
             CreateFile(dir);
 
-            File.WriteAllText(dir, _inMemoryLogger.ReadAll(), Encoding.UTF8);
+            File.WriteAllText(dir, _inMemoryLogger.ReadAll(), new UTF8Encoding(false));
         }
 
         private void CreateFile(string dir)
