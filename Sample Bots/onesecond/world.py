@@ -256,15 +256,15 @@ class World:
         :param player_key:
         :return:
         '''
-        # logger.info('action: {}'.format(action))
         player_key = player_key or self.hero
-        # logger.info('player_key: {}'.format(player_key))
+        logger.info('player {} taking action: {}'.format(player_key, action))
+
         player_entity = self.players[player_key]
-        # logger.debug('player_entity: {}'.format(player_entity))
+        logger.debug('player_entity: {}'.format(player_entity))
         px = player_entity['Location']['X']
         py = player_entity['Location']['Y']
         player_bombs = [b for b in self.bombs if b['Owner']['Key'] == player_key]
-        # logger.debug('player {} has {} bombs: {}'.format(player_key, len(player_bombs), player_bombs))
+        logger.debug('player {} has {} bombs: {}'.format(player_key, len(player_bombs), player_bombs))
 
         # do nothing
         if action == -1:
@@ -279,8 +279,6 @@ class World:
             # move up
             if action == 1:
                 block = self.state['GameBlocks'][px - 1][py - 2]
-                if block['Entity'] or block['Bomb']:
-                    return False
                 self.state['GameBlocks'][px - 1][py - 1]['Entity'] = None
                 self.players[player_key]['Location']['Y'] -= 1
                 self.state['GameBlocks'][px - 1][py - 2]['Entity'] = self.players[player_key]
@@ -288,8 +286,6 @@ class World:
             # move left
             if action == 2:
                 block = self.state['GameBlocks'][px - 2][py - 1]
-                if block['Entity'] or block['Bomb']:
-                    return False
                 self.state['GameBlocks'][px - 1][py - 1]['Entity'] = None
                 self.players[player_key]['Location']['X'] -= 1
                 self.state['GameBlocks'][px - 2][py - 1]['Entity'] = self.players[player_key]
@@ -297,8 +293,6 @@ class World:
             # move right
             elif action == 3:
                 block = self.state['GameBlocks'][px - 0][py - 1]
-                if block['Entity'] or block['Bomb']:
-                    return False
                 self.state['GameBlocks'][px - 1][py - 1]['Entity'] = None
                 self.players[player_key]['Location']['X'] += 1
                 self.state['GameBlocks'][px - 0][py - 1]['Entity'] = self.players[player_key]
@@ -306,18 +300,12 @@ class World:
             # move down
             elif action == 4:
                 block = self.state['GameBlocks'][px - 1][py - 0]
-                if block['Entity'] or block['Bomb']:
-                    return False
                 self.state['GameBlocks'][px - 1][py - 1]['Entity'] = None
                 self.players[player_key]['Location']['Y'] += 1
                 self.state['GameBlocks'][px - 1][py - 0]['Entity'] = self.players[player_key]
 
         # place bomb
         elif action == 5:
-            if len(player_bombs) >= player_entity['BombBag']:
-                return False
-            if self.state['GameBlocks'][px - 1][py - 1]['Bomb']:
-                return False
             bomb = {
                 "Owner": player_entity,
                 "BombRadius": player_entity['BombRadius'],
@@ -330,10 +318,6 @@ class World:
 
         # trigger bomb
         elif action == 6:
-            if len(player_bombs) < 1:
-                return False
-            if any([b for b in player_bombs if b['IsExploding']]):
-                return False
             oldest_bomb = min(player_bombs, key=lambda b: b['BombTimer'])
             # logger.debug('oldest bomb: {}'.format(oldest_bomb))
             bx = oldest_bomb['Location']['X'] - 1
@@ -346,6 +330,5 @@ class World:
         else:
             raise ValueError('Unknown action received {}'.format(action))
 
-        # logger.info('Action {} taken for {}'.format(self.actions[action], player_key))
-        return True
+        logger.info('Action {} taken for {}'.format(self.actions[action], player_key))
 

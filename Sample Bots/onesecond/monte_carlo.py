@@ -103,19 +103,17 @@ class MonteCarlo:
             self.propScore(world)
 
         logger.info('creating hero moves')
-        for action_code, action_name in world.actions.items():
+        for action_code in world.legal_actions():
+            action_name = world.actions[action_code]
             world_hero = deepcopy(world)
             logger.info('*' * 40)
             logger.info('hero {} in {}'.format(action_name, world_hero.id))
-            if not world_hero.take_action(action_code):
-                logger.warn('{} is invalid for hero'.format(action_name))
-                continue
+            world_hero.take_action(action_code)
             self.tree.create_node(action_name, world_hero.id, data=[0, 0, 1, action_code], parent=node.identifier)
             node_hero = self.tree[world_hero.id]
             logging.info('node hero {} [{}]: {} p={}'.format(node_hero.tag, node_hero.identifier, node_hero.data, node_hero.bpointer))
             # self.tree.show()
             # self.worlds[world_hero.id] = world_hero
-
 
             # get lists of legal foes actions
             foes = [f for f in world_hero.players if f != world_hero.hero]
@@ -139,7 +137,7 @@ class MonteCarlo:
                 self.tree.create_node(combo, world_combo.id, data=[0, 0, 1], parent=world_hero.id)
                 node_combo = self.tree[world_combo.id]
                 logging.info('combo node {}: {} p={}'.format(node_combo.tag, node_combo.data, node_combo.bpointer))
-                self.tree.show()
+                # self.tree.show()
                 self.worlds[world_combo.id] = world_combo
                 self.propScore(world_combo)
 
@@ -147,11 +145,11 @@ class MonteCarlo:
         node = self.tree[world.id]
         data = [world.score, 1, world.status]
         node.data = data
-        # logger.info('node = {}: {}'.format(node.tag, node.data))
+        logger.info('node = {}: {}'.format(node.tag, node.data))
 
         # update parents
         while node.bpointer:
             node = self.tree.parent(node.identifier)
             node.data[0] += data[0]
             node.data[1] += 1
-            # logger.info('node = {}: {}'.format(node.tag, node.data))
+            logger.info('node = {}: {}'.format(node.tag, node.data))

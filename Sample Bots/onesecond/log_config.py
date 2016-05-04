@@ -12,7 +12,7 @@ log_config = {
     'filters': {},
     'handlers': {
         'stdout': {
-            'level': 'INFO',
+            'level': 'ERROR',
             'class': 'logging.StreamHandler',
             'formatter': 'min',
             'stream': 'ext://sys.stdout',
