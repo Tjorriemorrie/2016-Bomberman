@@ -195,6 +195,57 @@ class World:
 
         self.state['CurrentRound'] += 1
 
+    def legal_actions(self, player_key=None):
+        player_key = player_key or self.hero
+        logger.debug('player_key: {}'.format(player_key))
+
+        logger.info('calculating valid actions for player {}'.format(player_key))
+
+        player_entity = self.players[player_key]
+        logger.debug('player_entity: {}'.format(player_entity))
+
+        px = player_entity['Location']['X'] - 1
+        py = player_entity['Location']['Y'] - 1
+        player_bombs = [b for b in self.bombs if b['Owner']['Key'] == player_key]
+        logger.debug('player {} has {} bombs: {}'.format(player_key, len(player_bombs), player_bombs))
+
+        # do nothing
+        legal = [-1]
+
+        # todo hero cannot move into exploding block
+
+        # move up
+        block_up = self.state['GameBlocks'][px][py - 1]
+        if not block_up['Entity'] and not block_up['Bomb']:
+            legal.append(1)
+
+        # move left
+        block_left = self.state['GameBlocks'][px - 1][py]
+        if not block_left['Entity'] and not block_left['Bomb']:
+            legal.append(2)
+
+        # move right
+        block_right = self.state['GameBlocks'][px + 1][py]
+        if not block_right['Entity'] and not block_right['Bomb']:
+            legal.append(3)
+
+        # move down
+        block_down = self.state['GameBlocks'][px][py + 1]
+        if not block_down['Entity'] and not block_down['Bomb']:
+            legal.append(4)
+
+        # place bomb
+        block_current = self.state['GameBlocks'][px][py]
+        if not block_current['Bomb'] and len(player_bombs) < player_entity['BombBag']:
+            legal.append(5)
+
+        # trigger bomb
+        if len(player_bombs) > 0:
+            legal.append(6)
+
+        logger.info('Player {} has legal actions {}'.format(player_key, legal))
+        return legal
+
     def take_action(self, action, player_key=None):
         '''
         ...

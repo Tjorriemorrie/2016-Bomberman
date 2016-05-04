@@ -117,46 +117,31 @@ class MonteCarlo:
             # self.worlds[world_hero.id] = world_hero
 
 
-            # get combos of foes' actions
+            # get lists of legal foes actions
             foes = [f for f in world_hero.players if f != world_hero.hero]
-            foe_invalids = {f: [] for f in foes}
-            for combo in product(world_hero.actions, repeat=len(foes)):
+            legals = [world_hero.legal_actions(f) for f in foes]
+            logger.info(legals)
 
-                all_valid = True
-                for foe_action, foe_key in zip(combo, foes):
-                    if foe_action in foe_invalids[foe_key]:
-                        all_valid = False
-                        break
-                if not all_valid:
-                    continue
-
-                # logger.info('-' * 30)
-                # logger.info('combo {}'.format(combo))
+            # get combos of foes' actions
+            for combo in product(*legals):
+                logger.info('-' * 30)
+                logger.info('combo {}'.format(combo))
                 world_combo = deepcopy(world_hero)
+
+                # take all foe actions
                 for foe_action, foe_key in zip(combo, foes):
                     foe_action_name = world_combo.actions[foe_action]
-                    # logger.info('foe {} doing {}'.format(foe_key, foe_action_name))
-                    if not world_combo.take_action(foe_action, foe_key):
-                        # logger.warn('{} cannot take action {}'.format(foe_key, foe_action_name))
-                        foe_invalids[foe_key].append(foe_action)
-                        all_valid = False
-                        break
-                if not all_valid:
-                    # logger.warn('Not all foes moves were valid, skipping')
-                    continue
+                    logger.info('foe {} doing {}'.format(foe_key, foe_action_name))
+                    world_combo.take_action(foe_action, foe_key)
 
                 world_combo.tock()
-                # logger.info('world combo added to tree {}'.format(world_combo.id))
+                logger.info('world combo added to tree {}'.format(world_combo.id))
                 self.tree.create_node(combo, world_combo.id, data=[0, 0, 1], parent=world_hero.id)
                 node_combo = self.tree[world_combo.id]
-                # logging.info('combo node {}: {} p={}'.format(node_combo.tag, node_combo.data, node_combo.bpointer))
-                # self.tree.show()
+                logging.info('combo node {}: {} p={}'.format(node_combo.tag, node_combo.data, node_combo.bpointer))
+                self.tree.show()
                 self.worlds[world_combo.id] = world_combo
                 self.propScore(world_combo)
-
-                # break  # combos
-
-                # break  # hero
 
     def propScore(self, world):
         node = self.tree[world.id]
