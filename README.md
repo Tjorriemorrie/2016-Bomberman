@@ -1,6 +1,6 @@
 # 2016-Bomberman
 
-The current release is version 1.1.0.
+The current release is version 1.2.1.
 
 For more information about the challenge see the [Challenge website](http://challenge.entelect.co.za/) .
 
@@ -18,8 +18,7 @@ In this project you will find everything you need to build and run a bot on your
 1. Game Engine - The game engine is responsible for running matches between players.
 2. Sample Bots - Sample bots can be used a starting point for your bot.
 3. Reference Bot - The reference bot contains some AI logic that will play the game based on predefined rules.  You can use this to play against your bot for testing purposes.
-4. Calibration Bots - Calibration bots are used to calibrate the game engine when running bots to determine the amount of time a player bot is allowed to make a decision before the game engine kills it.
-5. Binaries - Binaries for the current version of the game.  The binaries can be used to run the game without having to compile it your self.
+4. Sample State Files - Can be used as a starting point to get the parsing working for your bot.
 
 This project can be used to get a better understanding of the rules and to help debug your bot.
 
@@ -28,7 +27,7 @@ Improvements and enhancements may be made to the game engine code over time, but
 The game engine has been made available to the community for peer review and bug fixes, so if you find any bugs or have any concerns, please e-mail challenge@entelect.co.za, discuss it with us on the [Challenge forum](http://forum.entelect.co.za/) or submit a pull request on Github.
 
 ## Usage
-The easiest way to start using the game engine is to download the [binary release zip](https://github.com/EntelectChallenge/2016-Bomberman/releases/download/V1.1.0/Game.Engine.v1.1.0.zip). You will also need the .NET framework if you don't have it installed already - you can get the offline installer for [.NET Framework 4.5.1 here](http://www.microsoft.com/en-za/download/details.aspx?id=40779).
+The easiest way to start using the game engine is to download the [binary release zip](https://github.com/EntelectChallenge/2016-Bomberman/releases/download/V1.2.1/Game.Engine.v1.2.1.zip). You will also need the .NET framework if you don't have it installed already - you can get the offline installer for [.NET Framework 4.5.1 here](http://www.microsoft.com/en-za/download/details.aspx?id=40779).
 
 Once you have installed .NET and downloaded the binary release zip file, extract it and open a new Command Prompt in the Binaries/{version}/Game Engine folder.
 
@@ -66,7 +65,7 @@ You might have to change the configurate file depending on your system in order 
 
 We have changed things a bit this year when it comes to compiling and running the bot.  You will not longer be able to include a run.bat and compile.bat file, the system will do that for you based on your bot meta you included.  One of the reasons we decided to go this route is in order to add additional features to the game engine for instance running calibration bots.
 
-Sample bot project files can be downloaded [here.](https://github.com/EntelectChallenge/2016-Bomberman/releases/download/V1.1.0/Sample.Bots.zip)
+Sample bot project files can be downloaded [here.](https://github.com/EntelectChallenge/2016-Bomberman/releases/download/V1.2.1/Sample.Bots.zip)
 
 The game engine requires that you have `bot.json` file.  This will tell the game engine how to compile and run your bot.  The file must contain the following:
 
@@ -77,7 +76,8 @@ The game engine requires that you have `bot.json` file.  This will tell the game
     "NickName" :"John",
     "BotType": "CSharp",
     "ProjectLocation" : "",
-    "RunFile" : "Reference\\bin\\Debug\\Reference.exe"
+    "RunFile" : "Reference\\bin\\Debug\\Reference.exe",
+    "RunArgs" : ""
 }
 ```
 
@@ -95,6 +95,7 @@ The game engine requires that you have `bot.json` file.  This will tell the game
 5. Project Location - The root location of the project file.  For instance in C# solutions, that will point to folder containing the solution (.sln) file.  This will be used for bot compilation when you submit your bot.
 6. Run File - This is the main entry point file for your bot that will be executed to play the game.
   * Java user have to ensure that the main class is specified in the manifest file
+7. RunArgs - (Optional) Any additional arguments you would like to send your bot.  This will be the 3rd argument sent to your bot (if provided).
 
 The game engine might set additional runtime parameter in some scenarios, for instance specifying minimum memory allocation for java bots.
 
@@ -191,31 +192,6 @@ Disclaimer:  This feature was developed purely for fun, and will most likely cra
 2. Make sure that port 19010 is available for binding on your system
 3. Make sure the clients enter your computer name as it is registered on the network (IP Address might also work, but not always)
 4. Client players will connect to the host on ports 20001 - 20013
-
-## Release Notes
-
-### Version 1.0.0 - 11 April 2016
-Change Log:
-1.Initial release
-
-
-### Version 1.1.0 - 16 April 2016
-Change Log:
-1. Added the current round to the `state.json` file.
-2. Changed from total processor time to wall clock time when measuring bot execution times as this has better multi thread/processor core support.
-3. Moved all of the game engine dll files to separate folder to clean up the root directory.
-4. Added missing DoNothingCommand for C# sample bot.
-5. Fix issues starting bot processes on Linux.
-6. Improved reliability of round logging for bot's.
-
-How will this affect me?
-1. You will not be able to get the current round for the game from the game engine.
-2. Multi threaded bots will now be allowed.
-3. If you made changes to the config file, you will have to updated the new config file with the changes you made.
-4. The moves enum can now be used to send a do nothing command to the game engine.
-5. Bots other than .Net should now run correctly on Linux.  (Linux no longer requires elevated privileges, and bots will not run with increased processor priority)
-6. That last bot on the game engine will now correctly write it's log files at the end of a round.
-
 
 # Dem Rules
 ### Map Generation
@@ -323,12 +299,80 @@ Power ups can be collected by players to improve their players abilities
 Players will collect points during game play.  Points will be used (along with other conditions) to determine the player leaderboard and ultimately the winner
 
 1. Players will receive 10 points for destroying destructible walls.
-  1. If two bombs hit the same wall, both players will receive 10 points for destroying the wall.  Unless the wall was destroyed as result of a chain explosion.
+  1. If two bombs hit the same wall, both players will receive 10 points for destroying the wall.
 2. Players will receive points for killing another player based on the following equation ((100 + Max point per map for destructible walls) / players on map).  So on map with 10 destructible walls with 4 players the points for killing a player will be 50.
-  1. If two bombs hit another player, both players will receive points for killing the player.  Unless the player was killed as result of chain explosion.
+  1. If two bombs hit another player, both players will receive points for killing the player.
 3. Players will receive points based on map coverage:
   1. Points will only be calculated for each new block touched by a player.
   2. Points will determine player coverage on the map, with a map coverage of 100% giving the player 100 points.
 4. Players obtaining the Super Power up will receive additional points.
 5. When multiple player bombs are triggered in a bomb chain, all players with bombs forming part of the chain will receive the points for all entities destroyed in the chain.
 6. The round in which a player is killed will cause the player to forfeit all points earned in that round, and the player will lose points equal to the points earned when killing another player.
+
+## Release Notes
+
+### Version 1.2.1 - 30 April 2016
+Change Log:
+
+1. Added missing requirements.txt file for python bots.
+2. Support spaces in bot path executable.
+3. Use the game seed as console display and replay folder name instead of the seed used to generate the map.
+4. Added Scala sample bot (Thank you markvrensburg).
+5. Changed trigger bomb command behaviour to allow bots to trigger bombs even if they have bombs currently exploding on the map.
+6. Updated the map.txt to print player bombs on the same line, each bomb separated by a comma.
+
+How will this affect me?
+
+1. If you are developing a python bot, please include the requirement txt file.
+2. Bots will now be allowed to have spaces in their directory/file name.
+3. If passing in a seed to the game engine, it will now correctly display that seed and use it as the replay folder name.
+4. Entries developed using Scala will now be allowed.
+5. The game engine will no longer throw an exception and discard your command if you trigger a bomb while one of your other bombs are exploding.  The new behaviour will only take non exploding bombs into consideration for the trigger command.
+6. If you have a parser for the map.txt it will have to be updated to no longer take the new lines in to consideration when parsing bombs planted by players.
+
+### Version 1.1.1 - 23 April 2016
+Change Log:
+
+1. Added Python 3 sample bot. Thank you tjorriemorrie.
+2. Fixed java sample bot not reading the state file
+3. Removed the BOM information written at the beginning of each file from the game engine.
+4. Added a new RunArgs property to the bot.json file that can be used to pass additional information to the bot when executed by the game engine
+5. Fixed the java calibration bot not including the time to read the state.json file.
+6. Fixed the python calibration bot not including the time to read the state.json file.
+7. Fixed the node.js calibration bot doing some additional work not done by the other calibration bots.
+8. Removed the calibation bot directory. We are using some of the sample bots as calibration bots.
+
+How will this affect me?
+
+1. You now have a nice starting point for making a python 3 bot.
+2. New entrants can now just carry on with the parsing of the file contents.
+3. If you added special logic to remove the BOM information at the beginning of files, you should remove that logic.
+4. Will not affect you, unless you want to send your bot additional arguments.
+5. Java bots now get a couple of milliseconds extra to run.
+6. Python bots now get a couple of milliseconds extra to run.
+7. Node.JS bots now get a couple of milliseconds less to run.
+8. Will not affect you, this is just to clean up the repo a little.
+
+### Version 1.1.0 - 16 April 2016
+Change Log:
+
+1. Added the current round to the `state.json` file.
+2. Changed from total processor time to wall clock time when measuring bot execution times as this has better multi thread/processor core support.
+3. Moved all of the game engine dll files to separate folder to clean up the root directory.
+4. Added missing DoNothingCommand for C# sample bot.
+5. Fix issues starting bot processes on Linux.
+6. Improved reliability of round logging for bot's.
+
+How will this affect me?
+
+1. You will not be able to get the current round for the game from the game engine.
+2. Multi threaded bots will now be allowed.
+3. If you made changes to the config file, you will have to updated the new config file with the changes you made.
+4. The moves enum can now be used to send a do nothing command to the game engine.
+5. Bots other than .Net should now run correctly on Linux.  (Linux no longer requires elevated privileges, and bots will not run with increased processor priority)
+6. That last bot on the game engine will now correctly write it's log files at the end of a round.
+
+### Version 1.0.0 - 11 April 2016
+Change Log:
+
+1. Initial release

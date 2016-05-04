@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Security.AccessControl;
-using System.Text;
-using Domain.Meta;
 using GameEngine.Commands;
 using GameEngine.Commands.PlayerCommands;
 using TestHarness.Exceptions;
@@ -18,13 +14,19 @@ namespace TestHarness.TestHarnesses.Bot
     {
         protected readonly BotHarness ParentHarness;
         protected TimeSpan MaxRunTime;
-        private int _botReturnCode;
 
         protected BotRunner(BotHarness parentHarness)
         {
             ParentHarness = parentHarness;
 
             MaxRunTime = TimeSpan.FromSeconds(Settings.Default.MaxBotRuntimeSeconds);
+        }
+
+        protected string AddAdditionalRunArgs(string currentArgs)
+        {
+            var runArgs = ParentHarness.BotMeta.RunArgs;
+
+            return String.IsNullOrEmpty(runArgs) ? currentArgs : String.Format("{0} {1}", currentArgs, runArgs);
         }
 
         public void CalibrateBot()
@@ -52,7 +54,7 @@ namespace TestHarness.TestHarnesses.Bot
                     ParentHarness.Logger.LogDebug(String.Format("Executing bot with following commands {0} {1}", handler.ProcessToRun.StartInfo.FileName, handler.ProcessToRun.StartInfo.Arguments));
 
                     sw.Start();
-                    _botReturnCode = handler.RunProcess();
+                    handler.RunProcess();
                     sw.Stop();
 
                     ParentHarness.Logger.LogInfo("Your bots total execution time was " + sw.Elapsed);
@@ -60,7 +62,6 @@ namespace TestHarness.TestHarnesses.Bot
                 catch (Exception ex)
                 {
                     ParentHarness.Logger.LogException("Failure while executing bot " + handler.ProcessToRun.StartInfo.FileName + " " + handler.ProcessToRun.StartInfo.Arguments, ex);
-                    _botReturnCode = -1;
                 }
 
                 if (sw.Elapsed >= MaxRunTime)
