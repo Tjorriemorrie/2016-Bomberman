@@ -52,9 +52,13 @@ def main(player_key, output_path):
 
     # 20160429 1p in 108s
     # 20160503 108p in 2.6s
+    # deepcopy
+
     # calculating legal moves upfront for hero and foes
     # 20160504 108p in 2.2s
-    
+    # deepcopy 1.986s
+
+    # bitmask map
 
     with open(os.path.join(output_path, 'move.txt'), 'w') as f:
         f.write('{}\n'.format(action))

@@ -46,7 +46,7 @@ class MonteCarlo:
         action = -1
         action_points = 0
         for child in self.tree.children(self.tree.root):
-            logger.info('child {} {}'.format(child.tag, child.data))
+            logger.info('option {} for {} [{}]'.format(child.tag, child.data))
             if child.data[2] >= 0 and child.data[0] > action_points:
                 action_points = child.data[0]
                 action = child.data[3]
@@ -142,12 +142,18 @@ class MonteCarlo:
                 self.propScore(world_combo)
 
     def propScore(self, world):
+        '''
+        use min max to propagate score
+        :param world:
+        :return:
+        '''
         node = self.tree[world.id]
         data = [world.score, 1, world.status]
         node.data = data
         logger.info('node = {}: {}'.format(node.tag, node.data))
 
         # update parents
+        # todo fix this to be minmax AP
         while node.bpointer:
             node = self.tree.parent(node.identifier)
             node.data[0] += data[0]
